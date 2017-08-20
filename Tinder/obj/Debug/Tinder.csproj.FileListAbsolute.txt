@@ -1,0 +1,14 @@
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\bin\Debug\Tinder.exe.config
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\bin\Debug\Tinder.exe
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\bin\Debug\Tinder.pdb
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.csprojResolveAssemblyReference.cache
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\MainWindow.g.cs
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\App.g.cs
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder_MarkupCompile.cache
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder_MarkupCompile.lref
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\MainWindow.baml
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.g.resources
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.Properties.Resources.resources
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.csproj.GenerateResource.Cache
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.exe
+c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\Tinder.pdb
