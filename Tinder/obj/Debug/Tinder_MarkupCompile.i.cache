@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\Tinder\obj\Debug\
 Tinder
 none
 false
 DEBUG;TRACE
-c:\users\michal\documents\visual studio 2017\Projects\Tinder\Tinder\App.xaml
-3430220241
-
-11-796166758
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\Tinder\App.xaml
+3-1248620759
+2949842959
+11-1517308117
 13738642453
-Chat.xaml;Main.xaml;Profile.xaml;
+Pages\Login.xaml;Main.xaml;Pages\Signup.xaml;
 
 False
 
