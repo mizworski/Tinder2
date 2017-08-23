@@ -1,0 +1,7 @@
+.vs
+
+Tinder/bin
+Tinder/obj
+
+*.mdf
+*.ldf
