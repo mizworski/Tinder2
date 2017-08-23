@@ -1,0 +1,51 @@
+﻿<Page x:Class="Tinder.Pages.NewPairs"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Tinder.Pages"
+      mc:Ignorable="d" 
+      Title="Tinder" Height="450" Width="700">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Profile" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToProfile"/>
+            <Button Content="Matches" HorizontalAlignment="Left" Height="30" Margin="165,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToNewPairs"/>
+            <Button Content="Chat" HorizontalAlignment="Left" Height="30" Margin="320,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToChat"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="270"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Next" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="NextImage"/>
+                    <Button Content="Like" HorizontalAlignment="Left" Height="30" Margin="140,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
+                </Grid>
+                
+                <Image Grid.Row="0" HorizontalAlignment="Stretch" Height="Auto" Margin="50,20,50,50" VerticalAlignment="Stretch" Width="Auto" Name="ProfilePicture"/>
+            </Grid>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Height="30" Margin="10,10,10,0" TextWrapping="Wrap" Text="Michal" VerticalAlignment="Top" Width="Auto"/>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Height="Auto" Margin="10,50,10,10" TextWrapping="Wrap" Text="Opis" VerticalAlignment="Stretch" Width="Auto"/>
+        </Grid>
+    </Grid>
+</Page>

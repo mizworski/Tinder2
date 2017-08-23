@@ -5,25 +5,31 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Tinder.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="350" d:DesignWidth="300"
+      d:DesignHeight="450" d:DesignWidth="300"
       Title="Signup">
 
     <Grid>
 
-        <TextBlock HorizontalAlignment="Center" Margin="-95,-260,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Center"/>
-        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-210,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="12" Name="Username"/>
+        <TextBlock HorizontalAlignment="Center" Margin="-95,-290,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Center"/>
+        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-240,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="12" Name="Username" KeyDown="OnKeyDownHandler"/>
 
-        <TextBlock HorizontalAlignment="Center" Margin="-92,-140,0,0" TextWrapping="Wrap" Text="First Name" VerticalAlignment="Center"/>
-        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-90,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="20" Name="FirstName"/>
+        <TextBlock HorizontalAlignment="Center" Margin="-92,-170,0,0" TextWrapping="Wrap" Text="First Name" VerticalAlignment="Center"/>
+        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-120,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="20" Name="FirstName" KeyDown="OnKeyDownHandler"/>
 
-        <TextBlock HorizontalAlignment="Center" Margin="-97,-20,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Center"/>
-        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,30,0,0" VerticalAlignment="Center" Width="150" Padding="2,7" Name="Password"/>
+        <TextBlock HorizontalAlignment="Center" Margin="-97,-50,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Center"/>
+        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,0,0,0" VerticalAlignment="Center" Width="150" Padding="2,7" Name="Password" KeyDown="OnKeyDownHandler"/>
 
-        <TextBlock HorizontalAlignment="Center" Margin="-52,100,0,0" TextWrapping="Wrap" Text="Confirm password" VerticalAlignment="Center"/>
-        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,150,0,0" VerticalAlignment="Center" Width="150" Padding="2,7" Name="ConfirmPassword"/>
+        <TextBlock HorizontalAlignment="Center" Margin="-52,70,0,0" TextWrapping="Wrap" Text="Confirm password" VerticalAlignment="Center"/>
+        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,120,0,0" VerticalAlignment="Center" Width="150" Padding="2,7" Name="ConfirmPassword" KeyDown="OnKeyDownHandler"/>
 
-        <Button Content="Sign Up" HorizontalAlignment="Center" Height="30" Margin="0,240,0,0" VerticalAlignment="Center" Width="150" Name="SignUp" Click="Submit_Click"/>
+        <TextBlock HorizontalAlignment="Center" Margin="-108,180,0,0" TextWrapping="Wrap" Text="Gender" VerticalAlignment="Center"/>
+        
+        <Button Content="Sign Up" HorizontalAlignment="Center" Height="30" Margin="0,290,0,0" VerticalAlignment="Center" Width="150" Name="SignUp" Click="Submit_Click"/>
+        <Button Content="Go Back" HorizontalAlignment="Center" Height="30" Margin="0,360,0,0" VerticalAlignment="Center" Width="150" Name="LogIn" Click="GoBack"/>
 
-        <TextBlock HorizontalAlignment="Center" Margin="0,300,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Name="ErrorMessage"/>
+        <RadioButton Content="Male" HorizontalAlignment="Center" Height="20" Margin="0,225,80,0" VerticalAlignment="Center" Width="70" Name="IsMale"/>
+        <RadioButton Content="Female" HorizontalAlignment="Center" Height="20" Margin="80,225,0,0" VerticalAlignment="Center" Width="70" Name="IsFemale"/>
+
+        <TextBlock HorizontalAlignment="Center" Margin="0,420,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Name="ErrorMessage"/>
     </Grid>
 </Page>

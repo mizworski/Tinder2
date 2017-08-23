@@ -10,11 +10,14 @@
 
     <Grid>
         <Button Content="Sign Up" HorizontalAlignment="Center" Height="30" Margin="0,160,0,0" VerticalAlignment="Center" Width="150" Name="SignUp" Click="ChangeToSignup"/>
-        <Button Content="Log In" HorizontalAlignment="Center" Height="30" Margin="0,90,0,0" VerticalAlignment="Center" Width="150" Name="LogIn"/>
-        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-120,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="12"/>
+        <Button Content="Log In" HorizontalAlignment="Center" Height="30" Margin="0,90,0,0" VerticalAlignment="Center" Width="150" Name="LogIn" Click="TryLogin"/>
+
+        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,-120,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="150" Padding="2,7" MaxLength="12" Name="Username" KeyDown="OnKeyDownHandler"/>
         <TextBlock HorizontalAlignment="Center" Margin="-97,-50,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Center"/>
 
-        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,0,0,0" VerticalAlignment="Center" Width="150" Padding="2,7"/>
+        <PasswordBox HorizontalAlignment="Center" Height="30" Margin="0,0,0,0" VerticalAlignment="Center" Width="150" Padding="2,7" Name="Password" KeyDown="OnKeyDownHandler"/>
         <TextBlock HorizontalAlignment="Center" Margin="-95,-170,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Center"/>
+        
+        <TextBlock HorizontalAlignment="Center" Margin="0,230,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Name="ErrorMessage"/>
     </Grid>
 </Page>

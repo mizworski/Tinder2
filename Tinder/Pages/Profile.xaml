@@ -1,0 +1,43 @@
+﻿<Page x:Class="Tinder.Pages.Profile"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Tinder.Pages"
+      mc:Ignorable="d"
+      Title="Tinder" Height="450" Width="700">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Profile" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToProfile"/>
+            <Button Content="Matches" HorizontalAlignment="Left" Height="30" Margin="165,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToNewPairs"/>
+            <Button Content="Chat" HorizontalAlignment="Left" Height="30" Margin="320,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToChat"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <TextBlock HorizontalAlignment="Center" Height="25" Margin="0,10" TextWrapping="Wrap" Text="Michał" VerticalAlignment="Top" Width="730" TextAlignment="Center" Name="FirstName"/>
+
+            <TextBlock HorizontalAlignment="Left" Height="30" Margin="10,40,0,0" TextWrapping="Wrap" Text="Picture" VerticalAlignment="Top" Width="192" TextAlignment="Center"/>
+            <Image HorizontalAlignment="Left" Height="193" Margin="10,76,0,0" VerticalAlignment="Top" Width="192" Source="/Tinder;component/Pictures/default.jpg" Name="ProfilePicture"/>
+            <Button Content="Change image" HorizontalAlignment="Center" Height="30" Margin="45,274,535,96" VerticalAlignment="Center" Width="120" Click="UploadImage"/>
+
+            <TextBlock HorizontalAlignment="Right" Height="30" Margin="0,40,10,0" TextWrapping="Wrap" Text="Bio" VerticalAlignment="Top" Width="300" TextAlignment="Center"/>
+            <TextBox HorizontalAlignment="Right" Height="260" Margin="0,75,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Name="Bio"/>
+
+            <Button Content="Update" HorizontalAlignment="Center" Height="30" Margin="0,0,150,10" VerticalAlignment="Bottom" Width="120" Click="UpdateProfile"/>
+            <Button Content="Log Out" HorizontalAlignment="Center" Height="30" Margin="150,0,0,10" VerticalAlignment="Bottom" Width="120" Click="Logout"/>
+
+            <TextBlock HorizontalAlignment="Left" Height="30" Margin="215,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="170" Text="Looking for" TextAlignment="Center" />
+            <CheckBox Content="Females" HorizontalAlignment="Left" Height="30" Margin="215,75,0,0" VerticalAlignment="Top" Width="90" Name="InterestFemale"/>
+            <CheckBox Content="Males" HorizontalAlignment="Left" Height="30" Margin="215,110,0,0" VerticalAlignment="Top" Width="90" Name="InterestMale"/>
+        </Grid>
+    </Grid>
+</Page>

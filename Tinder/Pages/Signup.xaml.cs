@@ -36,6 +36,11 @@ namespace Tinder.Pages
             ConfirmPassword.Password = "";
         }
 
+        private void GoBack(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new Uri("Pages/Login.xaml", UriKind.Relative));
+        }
+
         private void Submit_Click(object sender, RoutedEventArgs e)
         {
             if (Username.Text.Length == 0)
@@ -67,13 +72,17 @@ namespace Tinder.Pages
                 }
                 else if (ConfirmPassword.Password.Length == 0)
                 {
-                    ErrorMessage.Text = "Enter Confirm password.";
+                    ErrorMessage.Text = "Confirm your password.";
                     ConfirmPassword.Focus();
                 }
                 else if (password != ConfirmPassword.Password)
                 {
-                    ErrorMessage.Text = "Confirm password must be same as password.";
+                    ErrorMessage.Text = "Both passwords must be the same.";
                     ConfirmPassword.Focus();
+                }
+                else if (!(IsMale.IsChecked ?? false) && !(IsFemale.IsChecked ?? false))
+                {
+                    ErrorMessage.Text = "Select your gender.";
                 }
                 else
                 {
@@ -83,24 +92,51 @@ namespace Tinder.Pages
                     using (var conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-
-                        var query = "INSERT INTO dbo.Users (Username, FirstName, PasswordHash) " +
-                                       "VALUES (@Username, @FirstName, @PasswordHash);";
-                        using (var cmd = new SqlCommand(query, conn))
+                        var checkIfUserExistsQuery =
+                            "SELECT * from dbo.Users WHERE Username='" + username + "'";
+                        using (var checkIfUserExists = new SqlCommand(checkIfUserExistsQuery, conn))
                         {
-                            cmd.CommandType = CommandType.Text;
-                            cmd.Connection = conn;
-                            
-                            cmd.Parameters.AddWithValue("@Username", Username.Text);
-                            cmd.Parameters.AddWithValue("@FirstName", FirstName.Text);
-                            cmd.Parameters.AddWithValue("@PasswordHash", Password.Password);
+                            checkIfUserExists.CommandType = CommandType.Text;
+                            checkIfUserExists.Connection = conn;
+                            var gender = (IsMale.IsChecked ?? false) ? 'M' : 'F';
+                            var adapter = new SqlDataAdapter {SelectCommand = checkIfUserExists};
+                            var dataSet = new DataSet();
+                            adapter.Fill(dataSet);
+                            if (dataSet.Tables[0].Rows.Count > 0)
+                            {
+                                ErrorMessage.Text = "User with this username already exists. Choose new username.";
+                            }
+                            else
+                            {
+                                const string addUserQuery =
+                                    "INSERT INTO dbo.Users (Username, FirstName, PasswordHash, Gender, InterestedInMales, InterestedInFemales) " +
+                                    "VALUES (@Username, @FirstName, @PasswordHash, @Gender, 0, 0);";
+                                using (var addUser = new SqlCommand(addUserQuery, conn))
+                                {
+                                    addUser.CommandType = CommandType.Text;
+                                    addUser.Connection = conn;
+                                    
+                                    addUser.Parameters.AddWithValue("@Username", username);
+                                    addUser.Parameters.AddWithValue("@FirstName", firstname);
+                                    addUser.Parameters.AddWithValue("@PasswordHash", password);
+                                    addUser.Parameters.AddWithValue("@Gender", gender);
 
-                            cmd.ExecuteNonQuery(); 
+                                    addUser.ExecuteNonQuery();
+
+                                    NavigationService?.Navigate(new Uri("Pages/Login.xaml", UriKind.Relative));
+                                }
+                            }
                         }
                     }
-                    ErrorMessage.Text = "You have Registered successfully.";
-                    Reset();
                 }
+            }
+        }
+
+        private void OnKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                Submit_Click(sender, e);
             }
         }
 
