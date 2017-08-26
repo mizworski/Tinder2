@@ -45,13 +45,13 @@ namespace Tinder
                 var username = Username.Text;
                 var password = Password.Password;
 
-                var connectionString = GetConnectionString();
+                var connectionString = Utils.GetConnectionString();
 
                 using (var conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    var query = "SELECT Id from dbo.Users WHERE Username='" + username + "' and PasswordHash='" +
+                    var query = "SELECT * from dbo.Users WHERE Username='" + username + "' and PasswordHash='" +
                                 password +
                                 "'";
                     using (var cmd = new SqlCommand(query, conn))
@@ -66,13 +66,21 @@ namespace Tinder
                         {
                             case 1:
                                 var cache = MemoryCache.Default;
+
                                 var uid = Convert.ToInt32(results.Rows[0]["Id"]);
+                                var gender = Convert.ToChar(results.Rows[0]["Gender"]);
+                                var interestedInMale = Convert.ToBoolean(results.Rows[0]["InterestedInMales"]);
+                                var interestedInFemale = Convert.ToBoolean(results.Rows[0]["InterestedInFemales"]);
+
                                 var policy = new CacheItemPolicy
                                 {
                                     AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
                                 };
 
                                 cache.Set("UserId", uid, policy);
+                                cache.Set("Gender", gender, policy);
+                                cache.Set("InterestedInMales", interestedInMale, policy);
+                                cache.Set("InterestedInFemales", interestedInFemale, policy);
 
                                 NavigationService?.Navigate(new Uri("Pages/NewPairs.xaml", UriKind.Relative));
                                 break;
@@ -94,13 +102,6 @@ namespace Tinder
             {
                 TryLogin(sender, e);
             }
-        }
-
-        private static string GetConnectionString()
-        {
-            return @"Data Source=(LocalDB)\MSSQLLocalDB;
-                    AttachDbFilename=C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\Tinder\TinderDatabase.mdf;
-                    Integrated Security=True";
         }
     }
 }

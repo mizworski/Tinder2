@@ -23,7 +23,22 @@
             <Button Content="Chat" HorizontalAlignment="Left" Height="30" Margin="320,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="ChangeToChat"/>
         </Grid>
         <Grid Grid.Row="1">
-            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <ListBox Margin="10" Name="Pairs">
+                    <ListBoxItem>New York</ListBoxItem>
+                    <ListBoxItem>Los Angeles</ListBoxItem>
+                    <ListBoxItem>Paris</ListBoxItem>
+                    <ListBoxItem>Zurich</ListBoxItem>
+                </ListBox>
+
+            </Grid>
+
+            <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Height="Auto" Margin="10,10,10,10" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="Auto" Name="Bio"/>
+
         </Grid>
     </Grid>
 </Page>

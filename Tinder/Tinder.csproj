@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Pictures\default.jpg" />
+    <Resource Include="Pictures\shrug.jpg" />
     <Content Include="TinderDatabase.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -165,7 +166,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>TinderDatabase.mdf</DependentUpon>
     </Content>
-    <Resource Include="Pictures\michal.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

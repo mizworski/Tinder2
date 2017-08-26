@@ -23,7 +23,15 @@ namespace Tinder.Pages
         public Chat()
         {
             InitializeComponent();
+            LoadPairs();
         }
+
+        private void LoadPairs()
+        {
+            Pairs.Items.Clear();
+            Pairs.Items.Add("dupa");
+        }
+
         private void ChangeToProfile(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new Uri("Pages/Profile.xaml", UriKind.Relative));

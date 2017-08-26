@@ -39,7 +39,7 @@ namespace Tinder.Pages
             var cache = MemoryCache.Default;
             var uid = cache["UserId"] as int?;
 
-            var connectionString = GetConnectionString();
+            var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
                 conn.Open();
@@ -59,6 +59,13 @@ namespace Tinder.Pages
                         var bio = Convert.ToString(results.Rows[0]["Bio"]);
                         var interestedInMale = Convert.ToBoolean(results.Rows[0]["InterestedInMales"]);
                         var interestedInFemale = Convert.ToBoolean(results.Rows[0]["InterestedInFemales"]);
+
+                        var policy = new CacheItemPolicy
+                        {
+                            AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
+                        };
+                        cache.Set("InterestedInMales", interestedInMale, policy);
+                        cache.Set("InterestedInFemales", interestedInFemale, policy);
 
                         FirstName.Text = firstName;
                         Bio.Text = bio;
@@ -97,10 +104,10 @@ namespace Tinder.Pages
             var uid = cache["UserId"] as int?;
 
             var bio = Bio.Text;
-            var interestedInFemale = InterestFemale.IsChecked == true ? 1 : 0;
-            var interestedInMale = InterestMale.IsChecked == true ? 1 : 0;
+            var previouslyInterestedInFemale = cache["InterestedInFemales"] as bool?;
+            var previouslyInterestedInMale = cache["InterestedInMales"] as bool?;
 
-            var connectionString = GetConnectionString();
+            var connectionString = Utils.GetConnectionString();
 
             using (var conn = new SqlConnection(connectionString))
             {
@@ -114,8 +121,8 @@ namespace Tinder.Pages
                     updateProfile.Connection = conn;
 
                     updateProfile.Parameters.AddWithValue("@Bio", bio);
-                    updateProfile.Parameters.AddWithValue("@InterestedInMales", interestedInMale);
-                    updateProfile.Parameters.AddWithValue("@InterestedInFemales", interestedInFemale);
+                    updateProfile.Parameters.AddWithValue("@InterestedInMales", InterestMale.IsChecked);
+                    updateProfile.Parameters.AddWithValue("@InterestedInFemales", InterestFemale.IsChecked);
                     updateProfile.Parameters.AddWithValue("@Id", uid);
 
                     updateProfile.ExecuteNonQuery();
@@ -123,6 +130,11 @@ namespace Tinder.Pages
             }
 
             SetValues();
+
+            if (previouslyInterestedInFemale != InterestFemale.IsChecked || previouslyInterestedInMale != InterestMale.IsChecked)
+            {
+                NewPairs.FetchNewPeople();
+            }
         }
 
         private void ChangeToProfile(object sender, RoutedEventArgs e)
@@ -144,6 +156,8 @@ namespace Tinder.Pages
         {
             var cache = MemoryCache.Default;
             cache.Remove("UserId");
+            cache.Remove("NewUsers");
+            cache.Remove("CurrentProfileViewing");
 
             NavigationService?.Navigate(new Uri("Pages/Login.xaml", UriKind.Relative));
         }
@@ -169,7 +183,7 @@ namespace Tinder.Pages
                 resized.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
                 var imageBytes = stream.ToArray();
 
-                var connectionString = GetConnectionString();
+                var connectionString = Utils.GetConnectionString();
 
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -197,11 +211,6 @@ namespace Tinder.Pages
             SetValues();
         }
 
-        private static string GetConnectionString()
-        {
-            return @"Data Source=(LocalDB)\MSSQLLocalDB;
-                    AttachDbFilename=C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\Tinder\TinderDatabase.mdf;
-                    Integrated Security=True";
-        }
+
     }
 }
