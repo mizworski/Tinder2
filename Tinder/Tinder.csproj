@@ -113,12 +113,14 @@
     <Compile Include="Pages\NewPairs.xaml.cs">
       <DependentUpon>NewPairs.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Pair.cs" />
     <Compile Include="Pages\Profile.xaml.cs">
       <DependentUpon>Profile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Signup.xaml.cs">
       <DependentUpon>Signup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
