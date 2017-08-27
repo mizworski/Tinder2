@@ -1,28 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Runtime.Caching;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Tinder.Pages
 {
     /// <summary>
     /// Interaction logic for Chat.xaml
     /// </summary>
-    public partial class Chat : Page
+    public partial class Chat
     {
         public Chat()
         {
@@ -59,11 +50,15 @@ namespace Tinder.Pages
                     foreach (DataRow pairData in results.Rows)
                     {
                         var otherUserNumber = (int) pairData["User2Id"] == uid ? 1 : 2;
-
-                        var pair = new StackPanel {Orientation = Orientation.Horizontal};
-                        var name = new TextBlock
+                        var pairUserId = (int) (otherUserNumber == 1 ? pairData["User1Id"] : pairData["User2Id"]);
+                        var pair = new StackPanel
                         {
-                            Text = pairData["FirstName2"] as string,
+                            Orientation = Orientation.Horizontal,
+                        };
+
+                        var name = new PairInfo
+                        {
+                            Id = pairUserId,
                             Padding = new Thickness
                             {
                                 Left = 10,
@@ -144,11 +139,130 @@ namespace Tinder.Pages
         private void SendMessage(object sender, RoutedEventArgs e)
         {
             var message = MessageText.Text;
+            MessageText.Clear();
 
-            ChatHistory.Inlines.Add(message);
-            ChatHistory.Inlines.Add("\n");
+            var selectedPair = Pairs.SelectedItem as StackPanel;
+            int? pairUserId = null;
 
-            ChatScroller.ScrollToBottom();
+            if (selectedPair is null) return;
+
+            foreach (var child in selectedPair.Children)
+            {
+                if (child is PairInfo)
+                {
+                    pairUserId = (child as PairInfo).Id;
+                }
+            }
+
+            if (pairUserId is null)
+            {
+                return;
+            }
+
+            var cache = MemoryCache.Default;
+            var uid = cache["UserId"] as int?;
+            var connectionString = Utils.GetConnectionString();
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                const string query = "INSERT INTO dbo.Messages (Author, Recipient, Timestamp, Content) " +
+                                     "VALUES (@Author, @Recipient, @Timestamp, @Content);";
+                using (var sendMessage = new SqlCommand(query, conn))
+                {
+                    sendMessage.CommandType = CommandType.Text;
+                    sendMessage.Connection = conn;
+
+                    sendMessage.Parameters.AddWithValue("@Author", uid);
+                    sendMessage.Parameters.AddWithValue("@Recipient", pairUserId);
+                    sendMessage.Parameters.AddWithValue("@Timestamp", DateTime.UtcNow.Ticks);
+                    sendMessage.Parameters.AddWithValue("@Content", message);
+
+                    sendMessage.ExecuteNonQuery();
+                }
+            }
+            RefreshChat(sender, e);
+        }
+
+        private void LoadMessages(int pairUserId, string pairFirstName)
+        {
+            var cache = MemoryCache.Default;
+            var uid = cache["UserId"] as int?;
+
+            var connectionString = Utils.GetConnectionString();
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                const string query =
+                    "SELECT * FROM dbo.Messages WHERE (Author=@Other AND Recipient=@This) OR (Author=@This AND Recipient=@Other);";
+                using (var sendMessage = new SqlCommand(query, conn))
+                {
+                    sendMessage.CommandType = CommandType.Text;
+                    sendMessage.Connection = conn;
+
+                    sendMessage.Parameters.AddWithValue("@This", uid);
+                    sendMessage.Parameters.AddWithValue("@Other", pairUserId);
+
+                    sendMessage.ExecuteNonQuery();
+
+                    var adapter = new SqlDataAdapter {SelectCommand = sendMessage};
+                    var results = new DataTable();
+                    adapter.Fill(results);
+
+                    ChatHistory.Text = "";
+
+                    foreach (DataRow res in results.Rows)
+                    {
+                        var fromId = (int) res["Author"];
+                        var from = fromId == uid ? "You" : pairFirstName;
+                        var timestamp = (long) res["Timestamp"];
+                        var date = new DateTime(timestamp).ToString("HH:mm");
+                        var content = (string) res["Content"];
+                        var message = $"{from} {date}: {content}\n";
+
+                        ChatHistory.Inlines.Add(message);
+                    }
+
+                    ChatScroller.ScrollToBottom();
+                }
+            }
+        }
+
+        private void RefreshChat(object sender, RoutedEventArgs e)
+        {
+            var selectedPair = Pairs.SelectedItem as StackPanel;
+            int? pairUserId = null;
+            var pairFirstName = "";
+
+            if (selectedPair is null)
+            {
+                return;
+            }
+            foreach (var child in selectedPair.Children)
+            {
+                if (child is PairInfo)
+                {
+                    pairUserId = (child as PairInfo).Id;
+                    pairFirstName = (child as PairInfo).Text;
+                }
+            }
+            if (pairUserId is null)
+            {
+                return;
+            }
+
+            LoadMessages((int) pairUserId, pairFirstName);
+        }
+
+        private void OnKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                SendMessage(sender, e);
+            }
         }
 
         private void ChangeToProfile(object sender, RoutedEventArgs e)

@@ -1,31 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Tinder.Pages
 {
     /// <summary>
     /// Interaction logic for Signup.xaml
     /// </summary>
-    public partial class Signup : Page
+    public partial class Signup
     {
         public Signup()
         {
             InitializeComponent();
+            Username.Focus();
         }
 
         public void Reset()
@@ -87,7 +77,7 @@ namespace Tinder.Pages
                 else
                 {
                     ErrorMessage.Text = "";
-                    var connectionString = GetConnectionString();
+                    var connectionString = Utils.GetConnectionString();
 
                     using (var conn = new SqlConnection(connectionString))
                     {
@@ -138,13 +128,6 @@ namespace Tinder.Pages
             {
                 Submit_Click(sender, e);
             }
-        }
-
-        private static string GetConnectionString()
-        {
-            return @"Data Source=(LocalDB)\MSSQLLocalDB;
-                    AttachDbFilename=C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\Tinder\TinderDatabase.mdf;
-                    Integrated Security=True";
         }
     }
 }

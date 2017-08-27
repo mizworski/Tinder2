@@ -1,0 +1,12 @@
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\TinderServer.exe.config
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\TinderServer.exe
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\TinderServer.pdb
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\obj\Debug\TinderServer.csprojResolveAssemblyReference.cache
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\obj\Debug\TinderServer.exe
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\obj\Debug\TinderServer.pdb
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\Interface.dll
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\Interface.pdb
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\TinderDatabase.mdf
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\TinderDatabase_log.ldf
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Michal\documents\visual studio 2017\Projects\Tinder\TinderServer\bin\Debug\Newtonsoft.Json.xml

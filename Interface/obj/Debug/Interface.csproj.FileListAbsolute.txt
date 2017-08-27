@@ -1,0 +1,10 @@
+C:\Users\Michal\Documents\csharp\przyklad6\Przyklad\WCFCommunication\Interface\bin\Debug\Interface.dll
+C:\Users\Michal\Documents\csharp\przyklad6\Przyklad\WCFCommunication\Interface\bin\Debug\Interface.pdb
+C:\Users\Michal\Documents\csharp\przyklad6\Przyklad\WCFCommunication\Interface\obj\Debug\Interface.csprojResolveAssemblyReference.cache
+C:\Users\Michal\Documents\csharp\przyklad6\Przyklad\WCFCommunication\Interface\obj\Debug\Interface.dll
+C:\Users\Michal\Documents\csharp\przyklad6\Przyklad\WCFCommunication\Interface\obj\Debug\Interface.pdb
+C:\Users\Michal\Documents\Visual Studio 2017\Projects\Tinder\Interface\bin\Debug\Interface.dll
+C:\Users\Michal\Documents\Visual Studio 2017\Projects\Tinder\Interface\bin\Debug\Interface.pdb
+C:\Users\Michal\Documents\Visual Studio 2017\Projects\Tinder\Interface\obj\Debug\Interface.csprojResolveAssemblyReference.cache
+C:\Users\Michal\Documents\Visual Studio 2017\Projects\Tinder\Interface\obj\Debug\Interface.dll
+C:\Users\Michal\Documents\Visual Studio 2017\Projects\Tinder\Interface\obj\Debug\Interface.pdb

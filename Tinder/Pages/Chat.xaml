@@ -28,7 +28,7 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <ListBox Margin="10, 5" Name="Pairs">
+                <ListBox Margin="10, 5" Name="Pairs" SelectionChanged="RefreshChat">
 <!--                    <StackPanel Orientation="Horizontal">-->
 <!--                        <Image Height="32" Width="32" Source="/Tinder;component/Pictures/default.jpg"/>-->
 <!--                        <TextBlock Height="32" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="2, 7">Text below an Ellipse</TextBlock>-->
@@ -51,7 +51,7 @@
                         <ColumnDefinition Width="135" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" Height="25" HorizontalAlignment="Stretch" Margin="0, 5" Padding="2, 4" Name="MessageText" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Column="0" Height="25" HorizontalAlignment="Stretch" Margin="0, 5" Padding="2, 4" Name="MessageText" VerticalAlignment="Stretch" KeyDown="OnKeyDownHandler"/>
                     <Button Grid.Column="1" Content="Send" Height="25" HorizontalAlignment="Stretch" Margin="5" Name="SendMessageButton" VerticalAlignment="Stretch" Click="SendMessage"/>
                 </Grid>
             </Grid>

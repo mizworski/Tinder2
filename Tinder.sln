@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tinder", "Tinder\Tinder.csproj", "{2F3127BB-034F-4ECB-B983-E6B52515B594}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinderServer", "TinderServer\TinderServer.csproj", "{3DF286C4-C06E-47BB-854F-D756C92D1CAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interface", "Interface\Interface.csproj", "{B9AF79FB-11E7-4E89-9923-1B30E1D531B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{2F3127BB-034F-4ECB-B983-E6B52515B594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F3127BB-034F-4ECB-B983-E6B52515B594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F3127BB-034F-4ECB-B983-E6B52515B594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DF286C4-C06E-47BB-854F-D756C92D1CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DF286C4-C06E-47BB-854F-D756C92D1CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DF286C4-C06E-47BB-854F-D756C92D1CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DF286C4-C06E-47BB-854F-D756C92D1CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9AF79FB-11E7-4E89-9923-1B30E1D531B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9AF79FB-11E7-4E89-9923-1B30E1D531B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9AF79FB-11E7-4E89-9923-1B30E1D531B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9AF79FB-11E7-4E89-9923-1B30E1D531B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
