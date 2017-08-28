@@ -41,6 +41,21 @@ namespace Tinder
             Channel.UpdatePicture(uid, imageSerialized);
         }
 
+        public void LikePerson(int issuingId, int receivingId)
+        {
+            Channel.LikePerson(issuingId, receivingId);
+        }
+
+        public void SkipPerson(int issuingId, int receivingId)
+        {
+            Channel.SkipPerson(issuingId, receivingId);
+        }
+
+        public string FetchNewPeople(int uid)
+        {
+            return Channel.FetchNewPeople(uid);
+        }
+
         public void Disconnect()
         {
             Channel.Disconnect();

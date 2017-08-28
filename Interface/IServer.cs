@@ -22,6 +22,15 @@ namespace Interface
         [OperationContract(IsInitiating = true, IsTerminating = true, IsOneWay = true)]
         void UpdatePicture(int uid, string imageSerialized);
         
+        [OperationContract(IsInitiating = true, IsTerminating = true, IsOneWay = true)]
+        void LikePerson(int issuingId, int receivingId);
+
+        [OperationContract(IsInitiating = true, IsTerminating = true, IsOneWay = true)]
+        void SkipPerson(int issuingId, int receivingId);
+
+        [OperationContract(IsInitiating = true, IsTerminating = true)]
+        string FetchNewPeople(int uid);
+
         [OperationContract(IsInitiating = false, IsTerminating = true, IsOneWay = true)]
         void Disconnect();
     }

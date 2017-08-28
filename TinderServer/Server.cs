@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
 using System.Runtime.Caching;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
-using System.Xml;
 using Interface;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace TinderServer
@@ -156,6 +148,9 @@ namespace TinderServer
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
 
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -232,6 +227,9 @@ namespace TinderServer
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
 
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -255,9 +253,178 @@ namespace TinderServer
             }
         }
 
+        public void LikePerson(int issuingId, int receivingId)
+        {
+            Console.WriteLine("{0} - Client called 'LikePerson'", DateTime.Now);
+            OperationContext.Current.Channel.Faulted += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, issuingId);
+            OperationContext.Current.Channel.Closed += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, issuingId);
+
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+            AddInteration(issuingId, receivingId, '+');
+            CheckIfMatched(issuingId, receivingId);
+        }
+
+        public void SkipPerson(int issuingId, int receivingId)
+        {
+            Console.WriteLine("{0} - Client called 'SkipPerson'", DateTime.Now);
+            OperationContext.Current.Channel.Faulted += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, issuingId);
+            OperationContext.Current.Channel.Closed += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, issuingId);
+
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+            AddInteration(issuingId, receivingId, '-');
+        }
+
+        public string FetchNewPeople(int uid)
+        {
+            Console.WriteLine("{0} - Client called 'FetchNewPeople'", DateTime.Now);
+            OperationContext.Current.Channel.Faulted += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, uid);
+            OperationContext.Current.Channel.Closed += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
+
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+
+            string serializedData;
+            var connectionString = Utils.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var userInfoQuery = "SELECT * from dbo.Users WHERE Id='" + uid + "'";
+                char gender;
+                bool interestedInMale;
+                bool interestedInFemale;
+                using (var cmd = new SqlCommand(userInfoQuery, conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = conn;
+
+                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
+                    var results = new DataTable();
+                    adapter.Fill(results);
+                    if (results.Rows.Count != 1)
+                    {
+                        return "";
+                    }
+
+                    gender = Convert.ToChar(results.Rows[0]["Gender"]);
+                    interestedInMale = Convert.ToBoolean(results.Rows[0]["InterestedInMales"]);
+                    interestedInFemale = Convert.ToBoolean(results.Rows[0]["InterestedInFemales"]);
+                }
+
+                var isInterested = gender == 'M' ? "InterestedInMales=1" : "InterestedInFemales=1";
+                string isInteresting;
+                if (interestedInFemale && interestedInMale)
+                {
+                    isInteresting = "";
+                }
+                else if (interestedInFemale)
+                {
+                    isInteresting = " AND Gender='F'";
+                }
+                else
+                {
+                    isInteresting = " AND Gender='M'";
+                }
+
+                var subquery = "SELECT 1 FROM dbo.Interactions WHERE IssuingId=" + uid + "and ReceivingId=Id";
+
+                var query = "SELECT Id, FirstName, Bio, ProfilePicture FROM dbo.Users " +
+                            "WHERE NOT EXISTS (" + subquery + ") AND " +
+                            "Id!=" + uid + " AND " +
+                            isInterested + isInteresting;
+
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = conn;
+                    var adapter = new SqlDataAdapter { SelectCommand = cmd };
+                    var results = new DataTable();
+                    adapter.Fill(results);
+                    if (results.Rows.Count == 0)
+                    {
+                        return "";
+                    }
+
+                    serializedData = Serializer.SerializeObject(results);
+                }
+            }
+            return serializedData;
+        }
+
         public void Disconnect()
         {
             Console.WriteLine("{0} - Client called 'Disconnect'", DateTime.Now);
+        }
+
+        private void AddInteration(int issuingId, int receivingId, char decision)
+        {
+            var connectionString = Utils.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                const string addInteractionQuery =
+                    "INSERT INTO dbo.Interactions (IssuingId, ReceivingId, Decision) " +
+                    "VALUES (@IssuingId, @ReceivingId, @Decision);";
+
+                using (var addUser = new SqlCommand(addInteractionQuery, conn))
+                {
+                    addUser.CommandType = CommandType.Text;
+                    addUser.Connection = conn;
+
+                    addUser.Parameters.AddWithValue("@IssuingId", issuingId);
+                    addUser.Parameters.AddWithValue("@ReceivingId", receivingId);
+                    addUser.Parameters.AddWithValue("@Decision", decision);
+
+                    addUser.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private void CheckIfMatched(int issuingId, int receivingId)
+        {
+            var connectionString = Utils.GetConnectionString();
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var query = "SELECT * FROM dbo.Interactions WHERE IssuingId=" + receivingId + " AND ReceivingId=" +
+                            issuingId + ";";
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = conn;
+
+                    var adapter = new SqlDataAdapter { SelectCommand = cmd };
+                    var results = new DataTable();
+                    adapter.Fill(results);
+                    if (results.Rows.Count > 0)
+                    {
+                        const string createNewPairQuery = "INSERT INTO dbo.Pairs (User1Id, User2Id) " +
+                                                          "VALUES (@User1Id, @User2Id);";
+
+                        using (var createNewPair = new SqlCommand(createNewPairQuery, conn))
+                        {
+                            createNewPair.CommandType = CommandType.Text;
+                            createNewPair.Connection = conn;
+
+                            createNewPair.Parameters.AddWithValue("@User1Id", issuingId);
+                            createNewPair.Parameters.AddWithValue("@User2Id", receivingId);
+
+                            createNewPair.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
         }
     }
 }

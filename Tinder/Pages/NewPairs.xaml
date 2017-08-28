@@ -38,8 +38,8 @@
                         <ColumnDefinition Width="270"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="Skip" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="SkipPerson"/>
-                    <Button Content="Like" HorizontalAlignment="Left" Height="30" Margin="140,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="LikePerson"/>
+                    <Button Content="Skip" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="Skip"/>
+                    <Button Content="Like" HorizontalAlignment="Left" Height="30" Margin="140,10,0,0" VerticalAlignment="Top" Width="120" Grid.Column="1" Click="Like"/>
                 </Grid>
                 <TextBlock Grid.Row="0" TextAlignment="Center" HorizontalAlignment="Stretch" Height="30" Margin="70,310,72,0" TextWrapping="Wrap" Text="Michal" VerticalAlignment="Top" Width="Auto" Name="FirstName"/>
 

@@ -64,6 +64,8 @@ namespace Tinder
                     AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
                 };
 
+                cache.Remove("CurrentProfileViewing");
+                cache.Remove("NewUsers");
                 cache.Set("UserId", uid, policy);
                 cache.Set("Gender", gender, policy);
                 cache.Set("InterestedInMales", interestedInMale, policy);

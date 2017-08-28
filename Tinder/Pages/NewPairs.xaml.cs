@@ -6,13 +6,15 @@ using System.Runtime.Caching;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Interface;
+using Newtonsoft.Json;
 
 namespace Tinder.Pages
 {
     /// <summary>
     /// Interaction logic for NewPairs.xaml
     /// </summary>
-    public partial class NewPairs : Page
+    public partial class NewPairs
     {
         public NewPairs()
         {
@@ -23,8 +25,8 @@ namespace Tinder.Pages
         private void UpdatePage()
         {
             var cache = MemoryCache.Default;
-            var profileViewing = cache["CurrentProfileViewing"] as DataRow;
-            if (profileViewing is null)
+            var newUsers = cache["NewUsers"] as DataTable;
+            if (newUsers is null || newUsers.Rows.Count == 0)
             {
                 FetchNewPeople();
             }
@@ -32,118 +34,60 @@ namespace Tinder.Pages
             ShowPerson();
         }
 
-        private void SkipPerson(object sender, RoutedEventArgs e)
+        private void Skip(object sender, RoutedEventArgs e)
         {
             var cache = MemoryCache.Default;
             var newUsers = cache["NewUsers"] as DataTable;
-            var userToShow = cache["CurrentProfileViewing"] as DataRow;
+            var profileViewing = cache["CurrentProfileViewing"] as DataRow;
 
-            if (userToShow is null)
+            if (newUsers is null || profileViewing is null)
             {
-                FetchNewPeople();
+                UpdatePage();
                 return;
             }
 
             var uid = (int) cache["UserId"];
-            var profileViewing = (DataRow) cache["CurrentProfileViewing"];
             var receiving = (int) profileViewing["Id"];
-
-            AddInteration(uid, receiving, '-');
+            
+            var me = new User();
+            var server = new ServerConnection(me);
+            server.SkipPerson(uid, receiving);
 
             cache.Remove("CurrentProfileViewing");
-            userToShow.Delete();
-            newUsers?.AcceptChanges();
+            profileViewing.Delete();
+            newUsers.AcceptChanges();
 
             UpdatePage();
         }
 
-        private void LikePerson(object sender, RoutedEventArgs e)
+        private void Like(object sender, RoutedEventArgs e)
         {
             var cache = MemoryCache.Default;
             var newUsers = cache["NewUsers"] as DataTable;
-            var userToShow = cache["CurrentProfileViewing"] as DataRow;
+            var profileViewing = cache["CurrentProfileViewing"] as DataRow;
 
-            if (userToShow is null)
+            if (newUsers is null || profileViewing is null)
             {
-                FetchNewPeople();
+                UpdatePage();
                 return;
             }
 
             var uid = (int) cache["UserId"];
-            var profileViewing = (DataRow) cache["CurrentProfileViewing"];
             var receiving = (int) profileViewing["Id"];
 
-            AddInteration(uid, receiving, '+');
-            CheckIfMatched(uid, receiving);
+            var me = new User();
+            var server = new ServerConnection(me);
+            server.LikePerson(uid, receiving);
+
+            
             cache.Remove("CurrentProfileViewing");
-            userToShow.Delete();
-            newUsers?.AcceptChanges();
+            profileViewing.Delete();
+            newUsers.AcceptChanges();
 
             UpdatePage();
         }
 
-        private void CheckIfMatched(int issuingId, int receivingId)
-        {
-            var connectionString = Utils.GetConnectionString();
-
-            using (var conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-                var query = "SELECT * FROM dbo.Interactions WHERE IssuingId=" + receivingId + " AND ReceivingId=" +
-                            issuingId + ";";
-                using (var cmd = new SqlCommand(query, conn))
-                {
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Connection = conn;
-
-                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
-                    var results = new DataTable();
-                    adapter.Fill(results);
-                    if (results.Rows.Count > 0)
-                    {
-                        const string createNewPairQuery = "INSERT INTO dbo.Pairs (User1Id, User2Id) " +
-                                                          "VALUES (@User1Id, @User2Id);";
-
-                        using (var createNewPair = new SqlCommand(createNewPairQuery, conn))
-                        {
-                            createNewPair.CommandType = CommandType.Text;
-                            createNewPair.Connection = conn;
-
-                            createNewPair.Parameters.AddWithValue("@User1Id", issuingId);
-                            createNewPair.Parameters.AddWithValue("@User2Id", receivingId);
-
-                            createNewPair.ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-        }
-
-        private void AddInteration(int issuingId, int receivingId, char decision)
-        {
-            var connectionString = Utils.GetConnectionString();
-            using (var conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-                const string addInteractionQuery =
-                    "INSERT INTO dbo.Interactions (IssuingId, ReceivingId, Decision) " +
-                    "VALUES (@IssuingId, @ReceivingId, @Decision);";
-
-                using (var addUser = new SqlCommand(addInteractionQuery, conn))
-                {
-                    addUser.CommandType = CommandType.Text;
-                    addUser.Connection = conn;
-
-                    addUser.Parameters.AddWithValue("@IssuingId", issuingId);
-                    addUser.Parameters.AddWithValue("@ReceivingId", receivingId);
-                    addUser.Parameters.AddWithValue("@Decision", decision);
-
-                    addUser.ExecuteNonQuery();
-                }
-            }
-        }
+        
 
         private void ShowPerson()
         {
@@ -200,11 +144,8 @@ namespace Tinder.Pages
 
         public static void FetchNewPeople()
         {
-            var connectionString = Utils.GetConnectionString();
-
             var cache = MemoryCache.Default;
             var uid = cache["UserId"] as int?;
-            var gender = cache["Gender"] as char?;
             var interestedInMale = cache["InterestedInMales"] as bool?;
             var interestedInFemale = cache["InterestedInFemales"] as bool?;
 
@@ -214,47 +155,27 @@ namespace Tinder.Pages
                 cache.Remove("CurrentProfileViewing");
                 return;
             }
-
-            using (var conn = new SqlConnection(connectionString))
+            if (uid is null)
             {
-                conn.Open();
+                return;
+            }
 
-                var isInterested = gender == 'M' ? "InterestedInMales=1" : "InterestedInFemales=1";
-                string isInteresting;
-                if (interestedInFemale == true && interestedInMale == true)
+            var me = new User();
+            var server = new ServerConnection(me);
+            var response = server.FetchNewPeople((int)uid);
+
+            if (!response.Equals(""))
+            {
+                var policy = new CacheItemPolicy
                 {
-                    isInteresting = "";
-                }
-                else if (interestedInFemale == true)
-                {
-                    isInteresting = " AND Gender='F'";
-                }
-                else
-                {
-                    isInteresting = " AND Gender='M'";
-                }
-
-                var subquery = "SELECT 1 FROM dbo.Interactions WHERE IssuingId=" + uid + "and ReceivingId=Id";
-
-                var query = "SELECT Id, FirstName, Bio, ProfilePicture FROM dbo.Users " +
-                            "WHERE NOT EXISTS (" + subquery + ") AND " +
-                            "Id!=" + uid + " AND " +
-                            isInterested + isInteresting;
-
-                using (var cmd = new SqlCommand(query, conn))
-                {
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Connection = conn;
-                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
-                    var results = new DataTable();
-                    adapter.Fill(results);
-
-                    var policy = new CacheItemPolicy
-                    {
-                        AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
-                    };
-                    cache.Set("NewUsers", results, policy);
-                }
+                    AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
+                };
+                var results = (DataTable) Serializer.DeserializeObject(response);
+                cache.Set("NewUsers", results, policy);
+            }
+            else
+            {
+                // couldnt fetch, print error
             }
         }
 
