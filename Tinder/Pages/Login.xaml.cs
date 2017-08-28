@@ -43,7 +43,6 @@ namespace Tinder
                 var me = new User();
                 var server = new ServerConnection(me);
                 var response = server.Authenticate(username, password);
-                server.Disconnect();
 
                 if (!response.Item1)
                 {

@@ -16,14 +16,29 @@ namespace Tinder
             //
         }
 
-        public Tuple<bool, string> Authenticate(string userName, string password)
+        public Tuple<bool, string> Authenticate(string username, string password)
         {
-            return Channel.Authenticate(userName, password);
+            return Channel.Authenticate(username, password);
         }
 
-        public string[] GetFavoriteWebsites()
+        public Tuple<bool, string> Signup(string username, string firstname, string password, char gender)
         {
-            return Channel.GetFavoriteWebsites();
+            return Channel.Signup(username, firstname, password, gender);
+        }
+
+        public Tuple<bool, string, string> GetProfileInfo(int uid)
+        {
+            return Channel.GetProfileInfo(uid);
+        }
+
+        public void UpdateProfile(int uid, string bio, bool interestedInFemales, bool interestedInMales)
+        {
+            Channel.UpdateProfile(uid, bio, interestedInFemales, interestedInMales);
+        }
+
+        public void UpdatePicture(int uid, string imageSerialized)
+        {
+            Channel.UpdatePicture(uid, imageSerialized);
         }
 
         public void Disconnect()

@@ -4,9 +4,13 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Caching;
+using System.Text;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Interface;
 using Microsoft.Win32;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Image = System.Drawing.Image;
 using Size = System.Drawing.Size;
 
@@ -28,63 +32,58 @@ namespace Tinder.Pages
             var cache = MemoryCache.Default;
             var uid = cache["UserId"] as int?;
 
-            var connectionString = Utils.GetConnectionString();
-            using (var conn = new SqlConnection(connectionString))
+            if (uid is null)
             {
-                conn.Open();
-
-                var query = "SELECT * from dbo.Users WHERE Id='" + uid + "'";
-                using (var cmd = new SqlCommand(query, conn))
-                {
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Connection = conn;
-
-                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
-                    var results = new DataTable();
-                    adapter.Fill(results);
-                    if (results.Rows.Count == 1)
-                    {
-                        var firstName = Convert.ToString(results.Rows[0]["FirstName"]);
-                        var bio = Convert.ToString(results.Rows[0]["Bio"]);
-                        var interestedInMale = Convert.ToBoolean(results.Rows[0]["InterestedInMales"]);
-                        var interestedInFemale = Convert.ToBoolean(results.Rows[0]["InterestedInFemales"]);
-
-                        var policy = new CacheItemPolicy
-                        {
-                            AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
-                        };
-                        cache.Set("InterestedInMales", interestedInMale, policy);
-                        cache.Set("InterestedInFemales", interestedInFemale, policy);
-
-                        FirstName.Text = firstName;
-                        Bio.Text = bio;
-                        InterestFemale.IsChecked = interestedInFemale;
-                        InterestMale.IsChecked = interestedInMale;
-
-                        if (results.Rows[0]["ProfilePicture"].Equals(DBNull.Value)) return;
-
-                        var imageBytes = (byte[])results.Rows[0]["ProfilePicture"];
-
-                        var image = new BitmapImage();
-                        using (var mem = new MemoryStream(imageBytes))
-                        {
-                            mem.Position = 0;
-                            image.BeginInit();
-                            image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                            image.CacheOption = BitmapCacheOption.OnLoad;
-                            image.UriSource = null;
-                            image.StreamSource = mem;
-                            image.EndInit();
-                        }
-                        image.Freeze();
-                        ProfilePicture.Source = image;
-                    }
-                    else
-                    {
-                        Logout(null, null);
-                    }
-                }
+                Logout(null, null);
+                return;
             }
+
+            var me = new User();
+            var server = new ServerConnection(me);
+            var response = server.GetProfileInfo((int) uid);
+
+            if (!response.Item1)
+            {
+                Logout(null, null);
+                return;
+            }
+
+            var results = JsonConvert.DeserializeObject<DataTable>(response.Item2);
+
+            var firstName = Convert.ToString(results.Rows[0]["FirstName"]);
+            var bio = Convert.ToString(results.Rows[0]["Bio"]);
+            var interestedInMale = Convert.ToBoolean(results.Rows[0]["InterestedInMales"]);
+            var interestedInFemale = Convert.ToBoolean(results.Rows[0]["InterestedInFemales"]);
+
+            var policy = new CacheItemPolicy
+            {
+                AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
+            };
+            cache.Set("InterestedInMales", interestedInMale, policy);
+            cache.Set("InterestedInFemales", interestedInFemale, policy);
+
+            FirstName.Text = firstName;
+            Bio.Text = bio;
+            InterestFemale.IsChecked = interestedInFemale;
+            InterestMale.IsChecked = interestedInMale;
+
+            if (results.Rows[0]["ProfilePicture"].Equals(DBNull.Value)) return;
+            if (response.Item3.Equals("")) return;
+
+            var imageBytes = (byte[]) Serializer.DeserializeObject(response.Item3);
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageBytes))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            ProfilePicture.Source = image;
         }
 
         private void UpdateProfile(object sender, RoutedEventArgs e)
@@ -96,31 +95,22 @@ namespace Tinder.Pages
             var previouslyInterestedInFemale = cache["InterestedInFemales"] as bool?;
             var previouslyInterestedInMale = cache["InterestedInMales"] as bool?;
 
-            var connectionString = Utils.GetConnectionString();
-
-            using (var conn = new SqlConnection(connectionString))
+            if (uid is null)
             {
-                conn.Open();
-                const string updateProfileQuery = "UPDATE dbo.Users " +
-                                                  "SET Bio = @Bio, InterestedInMales = @InterestedInMales, InterestedInFemales = @InterestedInFemales " +
-                                                  "WHERE Id = @Id;";
-                using (var updateProfile = new SqlCommand(updateProfileQuery, conn))
-                {
-                    updateProfile.CommandType = CommandType.Text;
-                    updateProfile.Connection = conn;
-
-                    updateProfile.Parameters.AddWithValue("@Bio", bio);
-                    updateProfile.Parameters.AddWithValue("@InterestedInMales", InterestMale.IsChecked);
-                    updateProfile.Parameters.AddWithValue("@InterestedInFemales", InterestFemale.IsChecked);
-                    updateProfile.Parameters.AddWithValue("@Id", uid);
-
-                    updateProfile.ExecuteNonQuery();
-                }
+                Logout(sender, e);
+                return;
             }
+            ;
+
+            var me = new User();
+            var server = new ServerConnection(me);
+
+            server.UpdateProfile((int) uid, bio, InterestFemale.IsChecked ?? false, InterestMale.IsChecked ?? false);
 
             SetValues();
 
-            if (previouslyInterestedInFemale != InterestFemale.IsChecked || previouslyInterestedInMale != InterestMale.IsChecked)
+            if (previouslyInterestedInFemale != InterestFemale.IsChecked ||
+                previouslyInterestedInMale != InterestMale.IsChecked)
             {
                 NewPairs.FetchNewPeople();
             }
@@ -162,7 +152,7 @@ namespace Tinder.Pages
 
             var result = dlg.ShowDialog();
             if (result != true) return;
-            
+
             var filename = dlg.FileName;
             var img = (Bitmap) Image.FromFile(filename, true);
             var resized = new Bitmap(img, new Size(256, 256));
@@ -171,35 +161,23 @@ namespace Tinder.Pages
             {
                 resized.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
                 var imageBytes = stream.ToArray();
+                var imageSerialized = Serializer.SerializeObject(imageBytes);
 
-                var connectionString = Utils.GetConnectionString();
 
-                using (var conn = new SqlConnection(connectionString))
+                var cache = MemoryCache.Default;
+                var uid = cache["UserId"] as int?;
+                if (uid is null)
                 {
-                    conn.Open();
-                    var cache = MemoryCache.Default;
-                    var uid = cache["UserId"] as int?;
-
-                    const string uploadPictureQuery = "UPDATE dbo.Users " +
-                                                      "SET ProfilePicture = @ProfilePicture " +
-                                                      "WHERE Id = @Id;";
-
-                    using (var uploadPicture = new SqlCommand(uploadPictureQuery, conn))
-                    {
-                        uploadPicture.CommandType = CommandType.Text;
-                        uploadPicture.Connection = conn;
-
-                        uploadPicture.Parameters.AddWithValue("@ProfilePicture", imageBytes);
-                        uploadPicture.Parameters.AddWithValue("@Id", uid);
-
-                        uploadPicture.ExecuteNonQuery();
-                    }
+                    Logout(null, null);
+                    return;
                 }
+
+                var me = new User();
+                var server = new ServerConnection(me);
+                server.UpdatePicture((int) uid, imageSerialized);
             }
 
             SetValues();
         }
-
-
     }
 }
