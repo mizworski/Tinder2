@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Runtime.Caching;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Newtonsoft.Json;
-using Tinder.Pages;
 
-namespace Tinder
+namespace Tinder.Pages
 {
     /// <summary>
     /// Interaction logic for Login.xaml

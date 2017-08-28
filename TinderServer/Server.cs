@@ -105,7 +105,7 @@ namespace TinderServer
                     {
                         checkIfUserExists.CommandType = CommandType.Text;
                         checkIfUserExists.Connection = conn;
-                        var adapter = new SqlDataAdapter { SelectCommand = checkIfUserExists };
+                        var adapter = new SqlDataAdapter {SelectCommand = checkIfUserExists};
                         var dataSet = new DataSet();
                         adapter.Fill(dataSet);
                         if (dataSet.Tables[0].Rows.Count > 0)
@@ -161,7 +161,7 @@ namespace TinderServer
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = conn;
 
-                    var adapter = new SqlDataAdapter { SelectCommand = cmd };
+                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
                     var results = new DataTable();
                     adapter.Fill(results);
                     if (results.Rows.Count != 1)
@@ -173,12 +173,13 @@ namespace TinderServer
                     if (results.Rows[0]["ProfilePicture"].Equals(DBNull.Value))
                     {
                         bytesAsString = "";
-                    } else
+                    }
+                    else
                     {
-                        var imageBytes = (byte[])results.Rows[0]["ProfilePicture"];
+                        var imageBytes = (byte[]) results.Rows[0]["ProfilePicture"];
                         bytesAsString = Serializer.SerializeObject(imageBytes);
                     }
-                    
+
                     var json = JsonConvert.SerializeObject(results, Formatting.None);
                     return new Tuple<bool, string, string>(true, json, bytesAsString);
                 }
@@ -344,7 +345,7 @@ namespace TinderServer
                 {
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = conn;
-                    var adapter = new SqlDataAdapter { SelectCommand = cmd };
+                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
                     var results = new DataTable();
                     adapter.Fill(results);
                     if (results.Rows.Count == 0)
@@ -487,7 +488,7 @@ namespace TinderServer
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = conn;
 
-                    var adapter = new SqlDataAdapter { SelectCommand = cmd };
+                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
                     var results = new DataTable();
                     adapter.Fill(results);
 

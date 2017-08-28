@@ -1,9 +1,9 @@
-﻿using System;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 
 
 namespace Interface
 {
+    [ServiceContract]
     public interface IUser
     {
         [OperationContract(IsOneWay = true)]

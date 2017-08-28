@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using Interface;
 
 namespace Tinder
@@ -13,7 +9,7 @@ namespace Tinder
     {
         public void BroadcastMessage(string message)
         {
-            Console.WriteLine("Server Said: {0}", message);
+//            Console.WriteLine(@"Server Said: {0}", message); XD
         }
     }
 }

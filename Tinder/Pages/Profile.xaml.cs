@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Caching;
-using System.Text;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Interface;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Image = System.Drawing.Image;
 using Size = System.Drawing.Size;
 
@@ -100,7 +97,6 @@ namespace Tinder.Pages
                 Logout(sender, e);
                 return;
             }
-            ;
 
             var me = new User();
             var server = new ServerConnection(me);

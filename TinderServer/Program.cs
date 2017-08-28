@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinderServer
 {
-    class Program
+    internal class Program
     {
-        static Server serviceInstance = new Server();
+        private static readonly Server ServiceInstance = new Server();
 
-        static void Main()
+        private static void Main()
         {
             Console.WriteLine("WCF Server");
 
-            serviceInstance.UserConnected += new EventHandler<UserConnectedEventArgs>(serviceInstance_UserConnected);
+            ServiceInstance.UserConnected += serviceInstance_UserConnected;
 
             Console.Write("Starting WCF listener...");
 
-            using (ServiceHost host = new ServiceHost(serviceInstance))
+            using (ServiceHost host = new ServiceHost(ServiceInstance))
             {
                 host.Open();
                 Console.WriteLine(" started.\n");
@@ -28,7 +24,7 @@ namespace TinderServer
             }
         }
 
-        static void serviceInstance_UserConnected(object sender, UserConnectedEventArgs e)
+        private static void serviceInstance_UserConnected(object sender, UserConnectedEventArgs e)
         {
             e.ConnectedUser.BroadcastMessage("Hello!!!");
         }

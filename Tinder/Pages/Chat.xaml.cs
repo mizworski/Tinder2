@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Caching;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using Eneter.Messaging.DataProcessing.Serializing;
+using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
+using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
+using Eneter.Messaging.Nodes.Broker;
 using Interface;
 
 namespace Tinder.Pages
@@ -32,7 +37,7 @@ namespace Tinder.Pages
             {
                 return;
             }
-            
+
             var me = new User();
             var server = new ServerConnection(me);
             var resposne = server.FetchPairs((int) uid);
@@ -40,8 +45,8 @@ namespace Tinder.Pages
 
             foreach (DataRow pairData in results.Rows)
             {
-                var otherUserNumber = (int)pairData["User2Id"] == uid ? 1 : 2;
-                var pairUserId = (int)(otherUserNumber == 1 ? pairData["User1Id"] : pairData["User2Id"]);
+                var otherUserNumber = (int) pairData["User2Id"] == uid ? 1 : 2;
+                var pairUserId = (int) (otherUserNumber == 1 ? pairData["User1Id"] : pairData["User2Id"]);
                 var pair = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -74,7 +79,7 @@ namespace Tinder.Pages
                     }
                     else
                     {
-                        var imageBytes = (byte[])pairData["ProfilePicture1"];
+                        var imageBytes = (byte[]) pairData["ProfilePicture1"];
                         var image = new BitmapImage();
                         using (var mem = new MemoryStream(imageBytes))
                         {
@@ -103,7 +108,7 @@ namespace Tinder.Pages
                     }
                     else
                     {
-                        var imageBytes = (byte[])pairData["ProfilePicture2"];
+                        var imageBytes = (byte[]) pairData["ProfilePicture2"];
                         var image = new BitmapImage();
                         using (var mem = new MemoryStream(imageBytes))
                         {
@@ -129,6 +134,11 @@ namespace Tinder.Pages
         {
             var cache = MemoryCache.Default;
             var message = MessageText.Text;
+            if (message.Length == 0)
+            {
+                return;
+            }
+
             MessageText.Clear();
 
             var selectedPair = Pairs.SelectedItem as StackPanel;
@@ -149,11 +159,11 @@ namespace Tinder.Pages
             {
                 return;
             }
-            
+
             var me = new User();
             var server = new ServerConnection(me);
             server.SendMessage((int) uid, (int) pairUserId, message);
-            
+
             RefreshChat(sender, e);
         }
 
@@ -172,11 +182,11 @@ namespace Tinder.Pages
 
             foreach (DataRow res in results.Rows)
             {
-                var fromId = (int)res["Author"];
+                var fromId = (int) res["Author"];
                 var from = fromId == uid ? "You" : pairFirstName;
-                var timestamp = (long)res["Timestamp"];
+                var timestamp = (long) res["Timestamp"];
                 var date = new DateTime(timestamp).ToString("HH:mm");
-                var content = (string)res["Content"];
+                var content = (string) res["Content"];
                 var message = $"{from} {date}: {content}\n";
 
                 ChatHistory.Inlines.Add(message);
@@ -196,11 +206,9 @@ namespace Tinder.Pages
             }
             foreach (var child in selectedPair.Children)
             {
-                if (child is PairInfo)
-                {
-                    pairUserId = (child as PairInfo).Id;
-                    pairFirstName = (child as PairInfo).Text;
-                }
+                if (!(child is PairInfo)) continue;
+                pairUserId = (child as PairInfo).Id;
+                pairFirstName = (child as PairInfo).Text;
             }
             if (pairUserId is null)
             {
@@ -208,6 +216,61 @@ namespace Tinder.Pages
             }
 
             LoadMessages((int) pairUserId, pairFirstName);
+            ReceiveMessages();
+        }
+
+        private void ReceiveMessages()
+        {
+
+            ISerializer aSerializer = new DataContractJsonStringSerializer();
+
+            // Create broker.
+            IDuplexBrokerFactory aBrokerFactory = new DuplexBrokerFactory();
+            IDuplexBroker aBroker = aBrokerFactory.CreateBroker();
+
+            // Communicate using WebSockets.
+            IMessagingSystemFactory aMessaging = new WebSocketMessagingSystemFactory();
+            IDuplexInputChannel anInputChannel =
+                aMessaging.CreateDuplexInputChannel("ws://127.0.0.1:8843/CpuUsage/");
+
+            anInputChannel.ResponseReceiverConnected += (x, y) =>
+            {
+                Console.WriteLine("Connected client: " + y.ResponseReceiverId);
+            };
+            anInputChannel.ResponseReceiverDisconnected += (x, y) =>
+            {
+                Console.WriteLine("Disconnected client: " + y.ResponseReceiverId);
+            };
+
+            // Attach input channel and start listeing.
+            aBroker.AttachDuplexInputChannel(anInputChannel);
+
+            // Start working thread monitoring the CPU usage.
+            bool aStopWorkingThreadFlag = false;
+            Thread aWorkingThread = new Thread(() =>
+            {
+                PerformanceCounter aCpuCounter =
+                    new PerformanceCounter("Processor", "% Processor Time", "_Total");
+
+                while (!aStopWorkingThreadFlag)
+                {
+                    CpuUpdateMessage aMessage = new CpuUpdateMessage();
+                    aMessage.Usage = aCpuCounter.NextValue();
+
+                    //Console.WriteLine(aMessage.Usage);
+
+                    // Serialize the message.
+                    object aSerializedMessage =
+                        aSerializer.Serialize<CpuUpdateMessage>(aMessage);
+
+                    // Notify subscribers via the broker.
+                    // Note: The broker will forward the message to subscribed clients.
+                    aBroker.SendMessage("MyCpuUpdate", aSerializedMessage);
+
+                    Thread.Sleep(500);
+                }
+            });
+            aWorkingThread.Start();
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
@@ -225,7 +288,6 @@ namespace Tinder.Pages
 
         private void ChangeToNewPairs(object sender, RoutedEventArgs e)
         {
-
             NavigationService?.Navigate(new Uri("Pages/NewPairs.xaml", UriKind.Relative));
         }
 

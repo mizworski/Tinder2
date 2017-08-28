@@ -45,7 +45,7 @@ namespace Tinder.Pages
 
             var uid = (int) cache["UserId"];
             var receiving = (int) profileViewing["Id"];
-            
+
             var me = new User();
             var server = new ServerConnection(me);
             server.SkipPerson(uid, receiving);
@@ -76,15 +76,13 @@ namespace Tinder.Pages
             var server = new ServerConnection(me);
             server.LikePerson(uid, receiving);
 
-            
+
             cache.Remove("CurrentProfileViewing");
             profileViewing.Delete();
             newUsers.AcceptChanges();
 
             UpdatePage();
         }
-
-        
 
         private void ShowPerson()
         {
@@ -120,7 +118,12 @@ namespace Tinder.Pages
             FirstName.Text = userFirstName;
             Bio.Text = userBio;
 
-            if (userToShow["ProfilePicture"].Equals(DBNull.Value)) return;
+            if (userToShow["ProfilePicture"].Equals(DBNull.Value))
+            {
+                var defaultImg = new BitmapImage(new Uri("/Tinder;component/Pictures/default.jpg", UriKind.Relative));
+                ProfilePicture.Source = defaultImg;
+                return;
+            }
 
             var imageBytes = (byte[]) userToShow["ProfilePicture"];
 
@@ -146,7 +149,8 @@ namespace Tinder.Pages
             var interestedInMale = cache["InterestedInMales"] as bool?;
             var interestedInFemale = cache["InterestedInFemales"] as bool?;
 
-            if (interestedInFemale == false && interestedInMale == false) // Does checking 'cond == false' look dumb only to me to or it's actually dumb?
+            if (interestedInFemale == false && interestedInMale == false
+            ) // Does checking 'cond == false' look dumb only to me to or it's actually dumb?
             {
                 cache.Remove("NewUsers");
                 cache.Remove("CurrentProfileViewing");
@@ -159,21 +163,16 @@ namespace Tinder.Pages
 
             var me = new User();
             var server = new ServerConnection(me);
-            var response = server.FetchNewPeople((int)uid);
+            var response = server.FetchNewPeople((int) uid);
 
-            if (!response.Equals(""))
+            if (response.Equals("")) return;
+
+            var policy = new CacheItemPolicy
             {
-                var policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
-                };
-                var results = (DataTable) Serializer.DeserializeObject(response);
-                cache.Set("NewUsers", results, policy);
-            }
-            else
-            {
-                // couldnt fetch, print error
-            }
+                AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration
+            };
+            var results = (DataTable) Serializer.DeserializeObject(response);
+            cache.Set("NewUsers", results, policy);
         }
 
         private void ChangeToProfile(object sender, RoutedEventArgs e)
