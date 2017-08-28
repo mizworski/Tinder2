@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Runtime.Caching;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
 using Interface;
@@ -359,12 +358,96 @@ namespace TinderServer
             return serializedData;
         }
 
+        public string FetchPairs(int uid)
+        {
+            Console.WriteLine("{0} - Client called 'FetchPairs'", DateTime.Now);
+            OperationContext.Current.Channel.Faulted += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, uid);
+            OperationContext.Current.Channel.Closed += (sender, args) =>
+                Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
+
+            var connectionString = Utils.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var query = "SELECT p.User1Id, p.User2Id, u1.FirstName AS FirstName1, u2.FirstName AS FirstName2, " +
+                            "u1.ProfilePicture AS ProfilePicture1, u2.ProfilePicture AS ProfilePicture2 FROM dbo.Pairs p " +
+                            "JOIN dbo.Users u1 ON p.User1Id=u1.Id  " +
+                            "JOIN dbo.Users u2 ON p.User2Id=u2.Id  " +
+                            "WHERE User1Id=" + uid + " OR User2Id=" + uid + ";";
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = conn;
+
+                    var adapter = new SqlDataAdapter {SelectCommand = cmd};
+                    var results = new DataTable();
+                    adapter.Fill(results);
+
+                    return Serializer.SerializeObject(results);
+                }
+            }
+        }
+
+        public void SendMessage(int fromId, int toId, string content)
+        {
+            var connectionString = Utils.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                const string query = "INSERT INTO dbo.Messages (Author, Recipient, Timestamp, Content) " +
+                                     "VALUES (@Author, @Recipient, @Timestamp, @Content);";
+                using (var sendMessage = new SqlCommand(query, conn))
+                {
+                    sendMessage.CommandType = CommandType.Text;
+                    sendMessage.Connection = conn;
+
+                    sendMessage.Parameters.AddWithValue("@Author", fromId);
+                    sendMessage.Parameters.AddWithValue("@Recipient", toId);
+                    sendMessage.Parameters.AddWithValue("@Timestamp", DateTime.UtcNow.Ticks);
+                    sendMessage.Parameters.AddWithValue("@Content", content);
+
+                    sendMessage.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public string LoadMessages(int fromId, int toId)
+        {
+            var connectionString = Utils.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                const string query =
+                    "SELECT * FROM dbo.Messages WHERE (Author=@Other AND Recipient=@This) OR (Author=@This AND Recipient=@Other);";
+                using (var sendMessage = new SqlCommand(query, conn))
+                {
+                    sendMessage.CommandType = CommandType.Text;
+                    sendMessage.Connection = conn;
+
+                    sendMessage.Parameters.AddWithValue("@This", fromId);
+                    sendMessage.Parameters.AddWithValue("@Other", toId);
+
+                    sendMessage.ExecuteNonQuery();
+
+                    var adapter = new SqlDataAdapter {SelectCommand = sendMessage};
+                    var results = new DataTable();
+                    adapter.Fill(results);
+
+                    return Serializer.SerializeObject(results);
+                }
+            }
+        }
+
         public void Disconnect()
         {
             Console.WriteLine("{0} - Client called 'Disconnect'", DateTime.Now);
         }
 
-        private void AddInteration(int issuingId, int receivingId, char decision)
+        private static void AddInteration(int issuingId, int receivingId, char decision)
         {
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
@@ -389,7 +472,7 @@ namespace TinderServer
             }
         }
 
-        private void CheckIfMatched(int issuingId, int receivingId)
+        private static void CheckIfMatched(int issuingId, int receivingId)
         {
             var connectionString = Utils.GetConnectionString();
 
@@ -407,21 +490,21 @@ namespace TinderServer
                     var adapter = new SqlDataAdapter { SelectCommand = cmd };
                     var results = new DataTable();
                     adapter.Fill(results);
-                    if (results.Rows.Count > 0)
+
+                    if (results.Rows.Count <= 0) return;
+
+                    const string createNewPairQuery = "INSERT INTO dbo.Pairs (User1Id, User2Id) " +
+                                                      "VALUES (@User1Id, @User2Id);";
+
+                    using (var createNewPair = new SqlCommand(createNewPairQuery, conn))
                     {
-                        const string createNewPairQuery = "INSERT INTO dbo.Pairs (User1Id, User2Id) " +
-                                                          "VALUES (@User1Id, @User2Id);";
+                        createNewPair.CommandType = CommandType.Text;
+                        createNewPair.Connection = conn;
 
-                        using (var createNewPair = new SqlCommand(createNewPairQuery, conn))
-                        {
-                            createNewPair.CommandType = CommandType.Text;
-                            createNewPair.Connection = conn;
+                        createNewPair.Parameters.AddWithValue("@User1Id", issuingId);
+                        createNewPair.Parameters.AddWithValue("@User2Id", receivingId);
 
-                            createNewPair.Parameters.AddWithValue("@User1Id", issuingId);
-                            createNewPair.Parameters.AddWithValue("@User2Id", receivingId);
-
-                            createNewPair.ExecuteNonQuery();
-                        }
+                        createNewPair.ExecuteNonQuery();
                     }
                 }
             }

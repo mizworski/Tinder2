@@ -56,6 +56,21 @@ namespace Tinder
             return Channel.FetchNewPeople(uid);
         }
 
+        public string FetchPairs(int uid)
+        {
+            return Channel.FetchPairs(uid);
+        }
+
+        public void SendMessage(int fromId, int toId, string content)
+        {
+            Channel.SendMessage(fromId, toId, content);
+        }
+
+        public string LoadMessages(int fromId, int toId)
+        {
+            return Channel.LoadMessages(fromId, toId);
+        }
+
         public void Disconnect()
         {
             Channel.Disconnect();

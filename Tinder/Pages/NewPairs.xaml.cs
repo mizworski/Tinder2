@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.Caching;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Interface;
-using Newtonsoft.Json;
 
 namespace Tinder.Pages
 {

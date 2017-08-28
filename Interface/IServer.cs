@@ -31,6 +31,15 @@ namespace Interface
         [OperationContract(IsInitiating = true, IsTerminating = true)]
         string FetchNewPeople(int uid);
 
+        [OperationContract(IsInitiating = true, IsTerminating = true)]
+        string FetchPairs(int uid);
+
+        [OperationContract(IsInitiating = true, IsTerminating = true, IsOneWay = true)]
+        void SendMessage(int fromId, int toId, string content);
+
+        [OperationContract(IsInitiating = true, IsTerminating = true)]
+        string LoadMessages(int fromId, int toId);
+
         [OperationContract(IsInitiating = false, IsTerminating = true, IsOneWay = true)]
         void Disconnect();
     }
