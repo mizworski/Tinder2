@@ -4,5 +4,7 @@
 Tinder/bin
 Tinder/obj
 
+packages/*
+
 *.mdf
 *.ldf
