@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.ServiceModel;
@@ -13,7 +14,12 @@ namespace TinderServer
     public class Server : IServer
     {
         public event EventHandler<UserConnectedEventArgs> UserConnected;
+        public Dictionary<int, IUser> ConnectedUsers;
 
+        public Server()
+        {
+            ConnectedUsers = new Dictionary<int, IUser>();
+        }
         public Tuple<bool, string> Authenticate(string username, string password)
         {
             Console.WriteLine("{0} - Client called 'Authenticate'", DateTime.Now);
@@ -21,6 +27,7 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, username);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, username);
+            
 
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
@@ -393,8 +400,28 @@ namespace TinderServer
                 }
             }
             
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+            if (ConnectedUsers.ContainsKey(fromId))
+            {
+                try
+                {
+                    UserConnected?.Invoke(this, new UserConnectedEventArgs(ConnectedUsers[fromId]));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("nie pyklo XD");
+                }
+            }
+            if (ConnectedUsers.ContainsKey(toId))
+            {
+                try
+                {
+                    UserConnected?.Invoke(this, new UserConnectedEventArgs(ConnectedUsers[toId]));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("nie pyklo XD");
+                }
+            }
         }
 
 
@@ -429,11 +456,15 @@ namespace TinderServer
         public void Connect(int uid)
         {
             Console.WriteLine("{0} - Client {1} connected.", DateTime.Now, uid);
+
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            ConnectedUsers[uid] = connectedUser;
         }
 
-        public void Disconnect()
+        public void Disconnect(int uid)
         {
             Console.WriteLine("{0} - Client called 'Disconnect'", DateTime.Now);
+            ConnectedUsers.Remove(uid);
         }
 
         private static void AddInteration(int issuingId, int receivingId, char decision)

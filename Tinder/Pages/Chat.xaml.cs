@@ -213,24 +213,12 @@ namespace Tinder.Pages
         {
             RefreshChat(Pairs, ChatHistory, ChatScroller);
         }
-       
+
 
         public void RefreshChat(ListBox pairs, TextBlock chat, ScrollViewer scroller)
         {
-
-            //            Dispatcher.CurrentDispatcher.Invoke(() =>
-            //            {
-//            if (ListBox)
-//            {
-//                this.lblCounter.BeginInvoke((MethodInvoker)delegate () { this.lblCounter.Text = this.index.ToString(); ; });
-//            }
-//            else
-//            {
-//                this.lblCounter.Text = this.index.ToString(); ;
-//            }
             Dispatcher.Invoke(() =>
             {
-                Console.WriteLine("dupa");
                 var selectedPair = pairs.SelectedItem as StackPanel;
                 int? pairUserId = null;
                 var pairFirstName = "";
@@ -249,33 +237,8 @@ namespace Tinder.Pages
                 {
                     return;
                 }
-                LoadMessages((int)pairUserId, pairFirstName, chat, scroller);
+                LoadMessages((int) pairUserId, pairFirstName, chat, scroller);
             });
-//            });
-
-//            Application.Current.Dispatcher.Invoke(() =>
-//                {
-//                    var selectedPair = pairs.SelectedItem as StackPanel;
-//                    int? pairUserId = null;
-//                    var pairFirstName = "";
-//
-//                    if (selectedPair is null)
-//                    {
-//                        return;
-//                    }
-//                    foreach (var child in selectedPair.Children)
-//                    {
-//                        if (!(child is PairInfo)) continue;
-//                        pairUserId = (child as PairInfo).Id;
-//                        pairFirstName = (child as PairInfo).Text;
-//                    }
-//                    if (pairUserId is null)
-//                    {
-//                        return;
-//                    }
-//                    LoadMessages((int) pairUserId, pairFirstName, chat, scroller);
-//                }, DispatcherPriority.ContextIdle
-//            );
         }
 
 
@@ -291,7 +254,9 @@ namespace Tinder.Pages
         {
             var cache = MemoryCache.Default;
             var server = cache["ServerConnection"] as ServerConnection;
-            server?.Disconnect();
+            var uid = cache["UserId"] as int?;
+            if (uid is null) return;
+            server?.Disconnect((int) uid);
             NavigationService?.Navigate(new Uri("Pages/Profile.xaml", UriKind.Relative));
         }
 
@@ -299,13 +264,15 @@ namespace Tinder.Pages
         {
             var cache = MemoryCache.Default;
             var server = cache["ServerConnection"] as ServerConnection;
-            server?.Disconnect();
+            var uid = cache["UserId"] as int?;
+            if (uid is null) return;
+            server?.Disconnect((int) uid);
             NavigationService?.Navigate(new Uri("Pages/NewPairs.xaml", UriKind.Relative));
         }
 
         private void ChangeToChat(object sender, RoutedEventArgs e)
         {
-            NavigationService?.Navigate(new Uri("Pages/Chat.xaml", UriKind.Relative));
+//            NavigationService?.Navigate(new Uri("Pages/Chat.xaml", UriKind.Relative));
         }
     }
 }

@@ -71,9 +71,9 @@ namespace Tinder
             Channel.Connect(uid);
         }
 
-        public void Disconnect()
+        public void Disconnect(int uid)
         {
-            Channel.Disconnect();
+            Channel.Disconnect(uid);
         }
     }
 }

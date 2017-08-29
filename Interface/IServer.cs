@@ -43,7 +43,7 @@ namespace Interface
         void Connect(int uid);
 
         [OperationContract(IsInitiating = false, IsTerminating = true, IsOneWay = true)]
-        void Disconnect();
+        void Disconnect(int uid);
     }
 }
 

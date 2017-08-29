@@ -4,6 +4,12 @@
 Tinder/bin
 Tinder/obj
 
+TinderServer/bin
+TinderServer/obj
+
+Interface/bin
+Interface/obj
+
 packages/*
 
 *.mdf

@@ -34,17 +34,10 @@ namespace Tinder
 
         public void LoadMessages()
         {
-            Action action = () =>
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
             {
                 _ui.RefreshChat(_pairs, _chat, _scroller);
-            };
-            Application.Current.Dispatcher.BeginInvoke(action);
-        }
-
-
-        public void test()
-        {
-            Console.WriteLine("ddd");
+            }));
         }
     }
 }
