@@ -406,7 +406,7 @@ namespace TinderServer
                 {
                     UserConnected?.Invoke(this, new UserConnectedEventArgs(ConnectedUsers[fromId]));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Console.WriteLine("nie pyklo XD");
                 }
@@ -417,7 +417,7 @@ namespace TinderServer
                 {
                     UserConnected?.Invoke(this, new UserConnectedEventArgs(ConnectedUsers[toId]));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Console.WriteLine("nie pyklo XD");
                 }

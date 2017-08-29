@@ -2,8 +2,6 @@
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Threading;
 using Interface;
 using Tinder.Pages;
 

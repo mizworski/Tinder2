@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using Eneter.Messaging.DataProcessing.Serializing;
-using Eneter.Messaging.MessagingSystems.MessagingSystemBase;
-using Eneter.Messaging.MessagingSystems.WebSocketMessagingSystem;
-using Eneter.Messaging.Nodes.Broker;
 using Interface;
 
 namespace Tinder.Pages
@@ -179,8 +170,6 @@ namespace Tinder.Pages
 
             var server = cache["ServerConnection"] as ServerConnection;
             server?.SendMessage((int) uid, (int) pairUserId, message);
-
-//            RefreshChat(Pairs, ChatHistory, ChatScroller);
         }
 
         private static void LoadMessages(int pairUserId, string pairFirstName, TextBlock chat, ScrollViewer scroller)
@@ -272,7 +261,6 @@ namespace Tinder.Pages
 
         private void ChangeToChat(object sender, RoutedEventArgs e)
         {
-//            NavigationService?.Navigate(new Uri("Pages/Chat.xaml", UriKind.Relative));
         }
     }
 }

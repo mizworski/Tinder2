@@ -8,14 +8,14 @@ Wydajność
 1. Pobieranie listy nowych osób współbieżnie.
 2. Aktualizacja listy par w oknie czatu, zamiast każdorazowego pobierania jej od początku.
 3. Usuwanie wpisu (wpisów) z tabeli 'Interactions' podczas tworzenia pary (dodawania wpisu do 'Pairs').
-4. Akutalizacja czatu i listy znajomych w jakiś sensowny sposób. (todo teraz)
+4. ConnectedUsers w klasie Server nie sprawdza czy callback IUser jest aktywny, co powoduje oczywiste błędy. Załatałem na szybko, ale do oczywistej poprawy bo memory leaki.
 
 Niezawodność i bezpieczeństwo
-1. Transakcyjność rejestracji użytkowników (jednoczesne sprawdzenie czy istnieje użytkownik o podanej nazwie i dodanie jeśli taki nie istnieje).
-2. Lepsza autoryzacja użytkowników (przechowywanie tokena po stronie klienta i serwera oraz późniejsze uwierzytelnianie za jego pomocą).
-3. Przechowywanie hashy haseł zamiast haseł (sic!).
-4. Transakcyjność dodawania wpisów do tabeli 'Interactions'. Możliwe że dwie osoby jednocześnie się nawazajem zlajkują i nie zostanie utworzona para.
-5. Obsługiwanie timeoutów, gdy serwer leży.
+1. (WAŻNE) Obsługiwanie timeoutów, gdy serwer leży. Obecnie aplikacja się crashuje.
+2. Transakcyjność rejestracji użytkowników (jednoczesne sprawdzenie czy istnieje użytkownik o podanej nazwie i dodanie jeśli taki nie istnieje).
+3. Lepsza autoryzacja użytkowników (przechowywanie tokena po stronie klienta i serwera oraz późniejsze uwierzytelnianie za jego pomocą).
+4. Przechowywanie hashy haseł zamiast haseł (sic!).
+5. Transakcyjność dodawania wpisów do tabeli 'Interactions'. Możliwe że dwie osoby jednocześnie się nawazajem zlajkują i nie zostanie utworzona para.
 6. (Generalnie sprawdzanie czy nie dodajemy do bazy danych sprzecznych informacji, generalnie trochę przypadków jest obsługiwanych, a trochę nie. Np. nie sprawdzam czy dodając do tabeli 'Interactions' wpisu (1,2,'+') [user o id 1 lajkuje usera o id 2], nie znajduje się tam już (1, 2, '-')).
 7. Zmiana rozmiarów obrazka podczas odebrania go od klienta. Na chwilę obecną zmianiam jego rozmiar po stronie klienta, jednak serwer nie broni się w przypadku 'złośliwego' (innego) klienta.
 8. Komunikacja z serwerem jest zrobiona przez wysyłanie stringa, a tam jest ustawiony jego max rozmiar. Gdy był ustawiony na 2^13, to nie byłem w stanie załadować listy 8 nowych osób. Generalnie komunikacja do przepisania, jeśli byłby to poważny projekt.

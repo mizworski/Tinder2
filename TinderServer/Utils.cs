@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TinderServer
+﻿namespace TinderServer
 {
     internal class Utils
     {
