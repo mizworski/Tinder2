@@ -22,9 +22,6 @@ namespace TinderServer
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, username);
 
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
-
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -64,9 +61,6 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, username);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, username);
-
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
 
             string errorMessage;
 
@@ -147,9 +141,6 @@ namespace TinderServer
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
 
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
-
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -194,9 +185,6 @@ namespace TinderServer
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
 
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
-
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -226,9 +214,7 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, uid);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
-
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+           
 
             var connectionString = Utils.GetConnectionString();
             using (var conn = new SqlConnection(connectionString))
@@ -260,9 +246,7 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, issuingId);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, issuingId);
-
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+            
             AddInteration(issuingId, receivingId, '+');
             CheckIfMatched(issuingId, receivingId);
         }
@@ -274,9 +258,7 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, issuingId);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, issuingId);
-
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
+            
             AddInteration(issuingId, receivingId, '-');
         }
 
@@ -287,9 +269,6 @@ namespace TinderServer
                 Console.WriteLine("{0} - Client '{1}' connection failed.", DateTime.Now, uid);
             OperationContext.Current.Channel.Closed += (sender, args) =>
                 Console.WriteLine("{0} - Client '{1}' connection closed.", DateTime.Now, uid);
-
-            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
-            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
 
             string serializedData;
             var connectionString = Utils.GetConnectionString();
@@ -413,7 +392,11 @@ namespace TinderServer
                     sendMessage.ExecuteNonQuery();
                 }
             }
+            
+            var connectedUser = OperationContext.Current.GetCallbackChannel<IUser>();
+            UserConnected?.Invoke(this, new UserConnectedEventArgs(connectedUser));
         }
+
 
         public string LoadMessages(int fromId, int toId)
         {
@@ -441,6 +424,11 @@ namespace TinderServer
                     return Serializer.SerializeObject(results);
                 }
             }
+        }
+
+        public void Connect(int uid)
+        {
+            Console.WriteLine("{0} - Client {1} connected.", DateTime.Now, uid);
         }
 
         public void Disconnect()

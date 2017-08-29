@@ -66,6 +66,11 @@ namespace Tinder
             return Channel.LoadMessages(fromId, toId);
         }
 
+        public void Connect(int uid)
+        {
+            Channel.Connect(uid);
+        }
+
         public void Disconnect()
         {
             Channel.Disconnect();

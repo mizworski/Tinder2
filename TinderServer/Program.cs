@@ -11,7 +11,7 @@ namespace TinderServer
         {
             Console.WriteLine("WCF Server");
 
-            ServiceInstance.UserConnected += serviceInstance_UserConnected;
+            ServiceInstance.UserConnected += serviceInstance_UserSentMessage;
 
             Console.Write("Starting WCF listener...");
 
@@ -24,9 +24,10 @@ namespace TinderServer
             }
         }
 
-        private static void serviceInstance_UserConnected(object sender, UserConnectedEventArgs e)
+        private static void serviceInstance_UserSentMessage(object sender, UserConnectedEventArgs e)
         {
-            e.ConnectedUser.BroadcastMessage("Hello!!!");
+            e.ConnectedUser.LoadMessages();
+//            e.ConnectedUser.BroadcastMessage("Hello!!!");
         }
     }
 }
